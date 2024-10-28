@@ -394,7 +394,8 @@ I_AXI_LITE_INTERFACE    : AXI_LITE_INTERFACE
         TO_DECIPHER => REG_TO_DECIPHER,
         PLAIN_TEXT => REG_PLAIN_TEXT,
         CIPHER_TEXT => REG_CIPHER_TEXT
-            );       
+            );
+                   
 I_AES_CORE  : AES_CORE
     PORT MAP(
         CLK => S_AXI_ACLK,

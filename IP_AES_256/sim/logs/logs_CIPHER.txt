@@ -1,0 +1,10 @@
+run all
+---------------------------------------------------------------------------
+TEST 1 OK
+---------------------------------------------------------------------------
+---------------------------------------------------------------------------
+GLOBAL TEST : 1/1 OK
+---------------------------------------------------------------------------
+Failure: ===============Fin du test===============\n
+Time: 1945 ns  Iteration: 0  Process: /TB_CIPHER/P_SIM  File: C:/Users/UF670KMI/Documents/IP_lib/IP_lib.srcs/sim_1/imports/sim/TB_CIPHER.vhd
+$finish called at time : 1945 ns : File "C:/Users/UF670KMI/Documents/IP_lib/IP_lib.srcs/sim_1/imports/sim/TB_CIPHER.vhd" Line 110
