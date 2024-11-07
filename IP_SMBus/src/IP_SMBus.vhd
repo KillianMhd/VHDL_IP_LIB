@@ -27,7 +27,7 @@ use WORK.SpyOnMySigPkg.all;
 entity IP_SMBus is
     GENERIC(
         INPUT_CLK   : INTEGER := 100_000_000;
-        BUS_CLK     : INTEGER := 400_000);
+        BUS_CLK     : INTEGER := 100_000);
     PORT(
         -- Wishbone Interface signals
         WB_CLK_I    : in std_logic;
@@ -91,7 +91,7 @@ architecture Behavioral of IP_SMBus is
             ADDR        : in STD_LOGIC_VECTOR(6 downto 0);
             DATA_IN     : in STD_LOGIC_VECTOR(7 downto 0);
             DATA_OUT    : out STD_LOGIC_VECTOR(7 downto 0);
-            ACK_ERR     : out STD_LOGIC;
+            ACK         : out STD_LOGIC;
             SMBDAT      : inout STD_LOGIC;
             SMBCLK      : inout STD_LOGIC
             );
@@ -150,7 +150,7 @@ begin
             ADDR        => ADDR,
             DATA_IN     => TX_DATA,
             DATA_OUT    => RX_DATA,
-            ACK_ERR     => RxACK,
+            ACK         => RxACK,
             SMBDAT      => SMBDAT,
             SMBCLK      => SMBCLK
             );

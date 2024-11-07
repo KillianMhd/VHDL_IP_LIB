@@ -7,7 +7,7 @@ use WORK.SpyOnMySigPkg.all;
 entity smbus_controller is
   generic (
     input_clk : integer := 100_000_000;
-    bus_clk   : integer := 400_000
+    bus_clk   : integer := 100_000
   );
   port (
     clk      : in    std_logic;
@@ -19,7 +19,7 @@ entity smbus_controller is
     addr     : in    std_logic_vector(6 downto 0);
     data_in  : in    std_logic_vector(7 downto 0);
     data_out : out   std_logic_vector(7 downto 0);
-    ack_err  : out   std_logic;
+    ack      : out   std_logic;
     smbdat   : inout std_logic;
     smbclk   : inout std_logic   
   );
@@ -45,8 +45,8 @@ architecture behavioral of smbus_controller is
 begin
     smbdat  <= '0' when smbdat_int = '0' else 'Z';
     smbclk  <= '0' when smb_clk = '0' else 'Z';
-    ack_err <= ack;
     GlobalState <= debug;
+    
     p_clk_gen : process (clk, resetn) is
         variable cnt : integer range 0 to divider * 4;
     begin
