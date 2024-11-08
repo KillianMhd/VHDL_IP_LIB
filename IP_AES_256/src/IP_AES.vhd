@@ -100,8 +100,6 @@ architecture Behavioral of IP_AES is
             WR_EN_KEY_DEC       : out std_logic; 
             RD_EN_DECIPHER      : out std_logic;    
             RD_EN_CIPHER        : out std_logic;
-            VALID_ENC           : in std_logic;
-            VALID_DEC           : in std_logic;
             -- KEY -- 
             CIPHER_KEY          : out std_logic_vector(31 downto 0);
             DECIPHER_KEY        : out std_logic_vector(31 downto 0);
@@ -142,22 +140,22 @@ architecture Behavioral of IP_AES is
         
     COMPONENT FIFO_32to128 IS
         GENERIC(
-        FIFO_DEPTH  : integer := 4
+            FIFO_DEPTH  : integer := 4
         );
         PORT(
-        -- System --
-        CLK     : in std_logic;
-        RESETN  : in std_logic;
-        -- Control -- 
-        FLUSH   : in std_logic;
-        RD_EN   : in std_logic;
-        WR_EN   : in std_logic;
-        -- Status --
-        FULL    : out std_logic;
-        EMPTY   : out std_logic;
-        -- Data --
-        DATA_I  : in std_logic_vector(31 downto 0);
-        DATA_O  : out std_logic_vector(127 downto 0)
+            -- System --
+            CLK     : in std_logic;
+            RESETN  : in std_logic;
+            -- Control -- 
+            FLUSH   : in std_logic;
+            RD_EN   : in std_logic;
+            WR_EN   : in std_logic;
+            -- Status --
+            FULL    : out std_logic;
+            EMPTY   : out std_logic;
+            -- Data --
+            DATA_I  : in std_logic_vector(31 downto 0);
+            DATA_O  : out std_logic_vector(127 downto 0)
         );
     END COMPONENT FIFO_32to128;
     
@@ -197,7 +195,6 @@ architecture Behavioral of IP_AES is
             -- Status --
             FULL    : out std_logic;
             EMPTY   : out std_logic;
-            VALID   : out std_logic;
             -- Data --
             DATA_I  : in std_logic_vector(127 downto 0);
             DATA_O  : out std_logic_vector(31 downto 0)
@@ -254,8 +251,6 @@ architecture Behavioral of IP_AES is
     SIGNAL RD_EN_KEY_DEC       : std_logic; 
     SIGNAL WR_EN_DECIPHER      : std_logic;    
     SIGNAL WR_EN_ENC           : std_logic; 
-    SIGNAL VALID_ENC           : std_logic;
-    SIGNAL VALID_DEC           : std_logic;
 begin
 
 I_FIFO_KEY_CIPHER : FIFO_32to256
@@ -315,7 +310,6 @@ I_FIFO_CIPHER_TEXT   : FIFO_128to32
         WR_EN => WR_EN_ENC,
         FULL => ENC_TEXT_FULL,
         EMPTY => ENC_TEXT_EMPTY,
-        VALID => VALID_ENC,
         DATA_I  => CIPHER_TEXT,
         DATA_O  => REG_CIPHER_TEXT);
 
@@ -328,7 +322,6 @@ I_FIFO_DECIPHER_TEXT    : FIFO_128to32
         WR_EN => WR_EN_DECIPHER,
         FULL => DECIPHER_TEXT_FULL,
         EMPTY => DECIPHER_TEXT_EMPTY,
-        VALID => VALID_DEC,
         DATA_I  => DECIPHER_TEXT,
         DATA_O  => REG_DECIPHER);
                        
@@ -384,8 +377,6 @@ I_AXI_LITE_INTERFACE    : AXI_LITE_INTERFACE
         WR_EN_KEY_DEC => WR_EN_KEY_DEC,
         RD_EN_DECIPHER => RD_EN_DECIPHER,   
         RD_EN_CIPHER => RD_EN_CIPHER,
-        VALID_ENC => VALID_ENC,
-        VALID_DEC => VALID_DEC,
         -- KEY --     
         CIPHER_KEY => REG_CIPHER_KEY,
         DECIPHER_KEY => REG_DECIPHER_KEY,
@@ -394,8 +385,7 @@ I_AXI_LITE_INTERFACE    : AXI_LITE_INTERFACE
         TO_DECIPHER => REG_TO_DECIPHER,
         PLAIN_TEXT => REG_PLAIN_TEXT,
         CIPHER_TEXT => REG_CIPHER_TEXT
-            );
-                   
+            );       
 I_AES_CORE  : AES_CORE
     PORT MAP(
         CLK => S_AXI_ACLK,

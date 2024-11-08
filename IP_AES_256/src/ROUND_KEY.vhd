@@ -66,6 +66,7 @@ architecture Behavioral of ROUND_KEY is
     end function ADD_128;
 begin
     DONE <= done_algo;
+    
     P_SYNC  : process(CLK, RESETN,CURRENT_STATE)
         begin
         if RESETN = '0' then
@@ -85,23 +86,28 @@ begin
                 temp_data <= (others => '0');
                 if(VALID = '1' and done_algo ='0')then 
                     NEXT_STATE <= READ;
+                else
+                     NEXT_STATE <= IDLE;       
                 end if;
             when READ => 
                 READY <= '0';
                 done_algo <= '0';
                 RD_EN <= '1';
                 temp_data <= (others => '0');  
+                DATA_ROUND_KEY <= (others => '0');
                 NEXT_STATE <= ADD;     
             when ADD =>
                 READY <= '0';
                 done_algo <= '0';
                 RD_EN <= '0';
                 temp_data <= ADD_128(DATA_I,ROUND_KEY);
+                DATA_ROUND_KEY <= (others => '0');
                 NEXT_STATE <= DONE_ADD;
             when DONE_ADD =>
                 READY <= '0';
                 done_algo <= '1';
                 RD_EN <= '0';
+                temp_data <= ADD_128(DATA_I,ROUND_KEY);
                 DATA_ROUND_KEY <= temp_data;
                 NEXT_STATE <= IDLE;
             when others =>
