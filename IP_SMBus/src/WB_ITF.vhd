@@ -1,62 +1,54 @@
 ----------------------------------------------------------------------------------
--- Company: 
--- Engineer: 
--- 
--- Create Date: 28.10.2024 17:59:10
--- Design Name: 
--- Module Name: WB_ITF - Behavioral
--- Project Name: 
--- Target Devices: 
--- Tool Versions: 
--- Description: 
--- 
--- Dependencies: 
--- 
--- Revision:
--- Revision 0.01 - File Created
--- Additional Comments:
--- 
+-- This the Wishbone Slave Interface to enable interconnection with others IP Cores
+-- In this file, we've got 8bits Data in/out length and 3bits Address length
+-- Also, there is 5 internal registers : CONTROL,STATUS,ADDRESS,TRANSMIT and RECEIVE
+-- All of this registers are describe in the Technical Specification document (TS_SMBus_Core)
+-- With the help of the Wishbone specification document (wbspec_b3), we validate this 
+-- interface with a testbench (TB_WB_ITF.vhd) with a Wishbone Master model
 ----------------------------------------------------------------------------------
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 use IEEE.NUMERIC_STD.ALL;
 
+-- Entity declaration for the Wishbone Interface (WB_ITF)
 entity WB_ITF is
     PORT(
-        WB_CLK_I    : in std_logic;
-        WB_RST_I    : in std_logic;
-        ARST_I      : in std_logic;
-        WB_ADR_I    : in std_logic_vector(2 downto 0);
-        WB_DAT_I    : in std_logic_vector(7 downto 0);
-        WB_DAT_O    : out std_logic_vector(7 downto 0);
-        WB_WE_I     : in std_logic;
-        WB_STB_I    : in std_logic;
-        WB_CYC_I    : in std_logic;
-        WB_ACK_O    : out std_logic;
-        WB_INTA_O   : out std_logic;
-        -- ADDRESSE --
-        ADDR         : out std_logic_vector(6 downto 0);
-        -- CONTROL --
-        EN          : out std_logic;
-        RWB         : out std_logic;
-        TR_S        : out std_logic;
-        -- TRANSMIT --
+        WB_CLK_I    : in std_logic;  -- Wishbone clock input
+        WB_RST_I    : in std_logic;  -- Wishbone reset input
+        ARST_I      : in std_logic;  -- Asynchronous reset input
+        WB_ADR_I    : in std_logic_vector(2 downto 0);  -- Wishbone address input
+        WB_DAT_I    : in std_logic_vector(7 downto 0);  -- Wishbone data input
+        WB_DAT_O    : out std_logic_vector(7 downto 0); -- Wishbone data output
+        WB_WE_I     : in std_logic;  -- Wishbone write enable input
+        WB_STB_I    : in std_logic;  -- Wishbone strobe input
+        WB_CYC_I    : in std_logic;  -- Wishbone cycle input
+        WB_ACK_O    : out std_logic; -- Wishbone acknowledge output
+        WB_INTA_O   : out std_logic; -- Wishbone interrupt acknowledge output
+        -- Address output
+        ADDR        : out std_logic_vector(6 downto 0);
+        -- Control signals
+        EN          : out std_logic; -- Enable signal
+        RWB         : out std_logic; -- Read/Write signal
+        TR_S        : out std_logic; -- Transfer start signal
+        -- Transmit data output
         TX_DATA     : out std_logic_vector(7 downto 0);
-        -- RECEIVE --
+        -- Receive data input
         RX_DATA     : in std_logic_vector(7 downto 0);
-        -- STATUS --
-        Busy        : in std_logic;
-        RxACK       : in std_logic
-        );
+        -- Status signals
+        Busy        : in std_logic;  -- Busy status signal
+        RxACK       : in std_logic   -- Receive acknowledge signal
+    );
 end WB_ITF;
 
 architecture Behavioral of WB_ITF is
-    CONSTANT CONTROL  : std_logic_vector(2 downto 0) := "000"; --RW
-    CONSTANT STATUS   : std_logic_vector(2 downto 0) := "001"; --RO
-    CONSTANT ADDRESS  : std_logic_vector(2 downto 0) := "010"; --WO
-    CONSTANT TRANSMIT : std_logic_vector(2 downto 0) := "011"; --WO
-    CONSTANT RECEIVE  : std_logic_vector(2 downto 0) := "100"; --RO
+    -- Constant definitions for register addresses
+    CONSTANT CONTROL  : std_logic_vector(2 downto 0) := "000"; -- Control register (Read/Write)
+    CONSTANT STATUS   : std_logic_vector(2 downto 0) := "001"; -- Status register (Read Only)
+    CONSTANT ADDRESS  : std_logic_vector(2 downto 0) := "010"; -- Address register (Write Only)
+    CONSTANT TRANSMIT : std_logic_vector(2 downto 0) := "011"; -- Transmit register (Write Only)
+    CONSTANT RECEIVE  : std_logic_vector(2 downto 0) := "100"; -- Receive register (Read Only)
     
+    -- Signal declarations for internal registers
     SIGNAL reg_data_out : std_logic_vector(7 downto 0);
     SIGNAL reg_control  : std_logic_vector(7 downto 0);
     SIGNAL reg_status   : std_logic_vector(7 downto 0);
@@ -64,25 +56,22 @@ architecture Behavioral of WB_ITF is
     SIGNAL reg_transmit : std_logic_vector(7 downto 0);
     SIGNAL reg_receive  : std_logic_vector(7 downto 0);
 begin
-    -- PRESCALE Register --
-    ADDR             <= reg_addr(6 downto 0);
-    -- CONTROL Register --
-    EN              <= reg_control(0);
-    RWB             <= reg_control(1);
-    TR_s            <= reg_control(2);
-    -- TRANSMIT Register --
-    TX_DATA         <= reg_transmit;
-    -- RECEIVE Register --
-    reg_receive <= RX_DATA;
-    -- STATUS Register --
-    reg_status(0)   <= Busy;
-    reg_status(1)   <= RxACK;
-    reg_status(7 downto 2) <= (others => '0');
-    -- RX Register --
-    WB_DAT_O        <= reg_data_out;
+    -- Assign internal register values to output ports
+    ADDR             <= reg_addr(6 downto 0); -- Address output
+    EN              <= reg_control(0);        -- Enable signal
+    RWB             <= reg_control(1);        -- Read/Write signal
+    TR_s            <= reg_control(2);        -- Transfer start signal
+    TX_DATA         <= reg_transmit;          -- Transmit data output
+    reg_receive     <= RX_DATA;               -- Receive data input
+    reg_status(0)   <= Busy;                  -- Busy status signal
+    reg_status(1)   <= RxACK;                 -- Receive acknowledge signal
+    reg_status(7 downto 2) <= (others => '0');-- Unused status bits set to 0
+    WB_DAT_O        <= reg_data_out;          -- Wishbone data output
+
+    -- Process for handling write operations
     P_WR : process(WB_CLK_I, WB_RST_I, ARST_I)
     begin
-        if ARST_I = '0' then
+        if ARST_I = '0' then    -- Asynchronous reset
             WB_ACK_O <= '0';
             WB_INTA_O <= '0';
             reg_addr <= (others => '0');
@@ -93,7 +82,7 @@ begin
                 WB_ACK_O <= '0';
             else
                 if WB_CYC_I = '1' and WB_STB_I = '1' then
-                    if WB_WE_I = '1' then
+                    if WB_WE_I = '1' then   -- Write operation
                         case WB_ADR_I is
                             when ADDRESS =>
                                 WB_INTA_O <= '0';
@@ -117,7 +106,8 @@ begin
         end if;
     end process P_WR;
 
-    P_RD : process(WB_ADR_I,ARST_I,WB_CLK_I)
+    -- Process for handling read operations
+    P_RD : process(WB_ADR_I, ARST_I, WB_CLK_I)
     begin
         if ARST_I = '0' then
             reg_data_out <= (others => '0');
@@ -125,7 +115,7 @@ begin
             if WB_RST_I = '1' then
                 reg_data_out <= (others => '0');
             else    
-                if WB_WE_I = '0' then
+                if WB_WE_I = '0' then  -- Read operation
                     case WB_ADR_I is
                         when CONTROL =>
                             reg_data_out <= reg_control;

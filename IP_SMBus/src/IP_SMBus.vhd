@@ -1,21 +1,9 @@
 ----------------------------------------------------------------------------------
--- Company: 
--- Engineer: 
--- 
--- Create Date: 28.10.2024 17:59:10
--- Design Name: 
--- Module Name: IP_SMBus - Behavioral
--- Project Name: 
--- Target Devices: 
--- Tool Versions: 
--- Description: 
--- 
--- Dependencies: 
--- 
--- Revision:
--- Revision 0.01 - File Created
--- Additional Comments:
--- 
+-- This file is the TOP module :
+-- In this file, we're doing the port map and the connection between
+-- Wishbone interface (WB_ITF.vhd) and SMBus Controller (SMBus_CONTROLLER.vhd) 
+-- A TOP testbench (TB_IP_SMBus.vhd) is available in the sim folder 
+-- with a Wishbone Master model
 ----------------------------------------------------------------------------------
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
