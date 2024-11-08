@@ -43,6 +43,7 @@ architecture Behavioral of KEY_SCHEDULE is
     signal w : word_array;
 begin
     RD_KEY <= keys;
+    
     P_SYNC  : process(CLK, RESETN)
     begin
         if RESETN = '0' then
@@ -64,12 +65,18 @@ begin
                 next_state <= IDLE;   
             end if;
         when INIT_W =>
+            DONE <= '0';
+            WR_EN <= '0';
             w <= initialize_w(key);
             next_state <= EXPAND_KEY;
-            when EXPAND_KEY =>
+        when EXPAND_KEY =>
+            DONE <= '0';
+            WR_EN <= '0';
             w <= expand_key(w, SBox, rcon);
             next_state <= GEN_RD_KEY;
         when GEN_RD_KEY =>
+            DONE <= '0';
+            WR_EN <= '0';
             keys <= generate_rd_key(w);
             next_state <= DONE_ALGO;
         when DONE_ALGO =>

@@ -69,15 +69,19 @@ begin
                 temp_data <= (others => '0');
                 if(VALID = '1' and done_algo = '0')then 
                     NEXT_STATE <= SUB;
+                else
+                     NEXT_STATE <= IDLE;    
                 end if;    
             when SUB =>
                 READY <= '0';
                 done_algo <= '0';
                 temp_data <= SUB_128(DATA_I);
+                DATA_O <= (others => '0');
                 NEXT_STATE <= DONE_SUB;
             when DONE_SUB =>
                 READY <= '0';
                 done_algo <= '1';
+                temp_data <= SUB_128(DATA_I);
                 DATA_O <= temp_data;
                 NEXT_STATE <= IDLE;
             when others =>

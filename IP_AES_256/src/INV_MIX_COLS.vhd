@@ -81,6 +81,8 @@ begin
                 temp_data <= (others => '0');
                 if(VALID = '1' and done_algo = '0')then 
                     NEXT_STATE <= MIX;
+                else
+                    NEXT_STATE <= IDLE;    
                 end if;    
             when MIX =>
                 READY <= '0';

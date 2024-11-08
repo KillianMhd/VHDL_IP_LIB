@@ -33,7 +33,6 @@ entity FIFO_128to32 is
         FLUSH   : in std_logic;
         RD_EN   : in std_logic;
         WR_EN   : in std_logic;
-        VALID   : out std_logic;
         -- Status --
         FULL    : out std_logic;
         EMPTY   : out std_logic;
@@ -86,10 +85,7 @@ begin
             end if;
             
             if(RD_EN = '1')then
-                DATA_O <= FIFO(r_RD_INDEX);
-                VALID <= '1';
-            else
-                VALID <= '0';    
+                DATA_O <= FIFO(r_RD_INDEX);  
             end if;
             
             if(WR_EN ='1')then

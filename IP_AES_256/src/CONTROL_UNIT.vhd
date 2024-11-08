@@ -111,7 +111,7 @@ begin
                 DATA_NEXT_SHF <= (others => '0');
                 DATA_NEXT_MIX <= (others => '0');
                 CIPHER_TEXT <= (others => '0');
-                DONE_ALGO <= '0';
+                DONE_ALGO <= '1';
                 if(START_ALGO = '1')then
                     NEXT_STATE <= INIT;
                 else
@@ -143,6 +143,8 @@ begin
                 if(DONE_KEYS = '1')then
                     if(NB_ROUND = 0 and READY_ROUND_KEY = '1')then
                         NEXT_STATE <= ADD_KEY_INIT;
+                    else
+                        NEXT_STATE <= INIT;    
                     end if;
                 else
                     NEXT_STATE <= INIT;    
@@ -167,7 +169,11 @@ begin
                         NEXT_STATE <= SHIFT;
                     elsif(NB_ROUND = MAX_ROUND and READY_SHIFT = '1')then
                         NEXT_STATE <= SHIFT;
+                    else
+                        NEXT_STATE <= SBOX;        
                     end if;
+                else
+                    NEXT_STATE <= SBOX;    
                 end if;           
             when SHIFT =>
                 START_KEYS <= '0';
@@ -189,7 +195,11 @@ begin
                         NEXT_STATE <= MIX;
                     elsif(NB_ROUND = MAX_ROUND and READY_ROUND_KEY = '1')then
                         NEXT_STATE <= ADD_KEY_LAST;
+                    else
+                        NEXT_STATE <= SHIFT;     
                     end if;
+                else
+                    NEXT_STATE <= SHIFT;    
                 end if;      
             when MIX =>
                 START_KEYS <= '0';
@@ -208,6 +218,8 @@ begin
                 DONE_ALGO <= '0';
                 if(DONE_MIX = '1'and READY_ROUND_KEY = '1')then
                     NEXT_STATE <= ADD_KEY;
+                else
+                        NEXT_STATE <= MIX;     
                 end if;
             when ADD_KEY_INIT =>
                 START_KEYS <= '0';
@@ -226,6 +238,8 @@ begin
                 DONE_ALGO <= '0';
                 if(DONE_ADD = '1' and READY_SUB = '1')then
                     NEXT_STATE <= SBOX;
+                else
+                    NEXT_STATE <= ADD_KEY_INIT;    
                 end if;         
             when ADD_KEY =>
                 START_KEYS <= '0';
@@ -244,8 +258,12 @@ begin
                 DONE_ALGO <= '0';
                 if(DONE_ADD = '1')then
                     if(NB_ROUND < MAX_ROUND and READY_SUB = '1')then
-                        NEXT_STATE <= SBOX;   
+                        NEXT_STATE <= SBOX;  
+                    else
+                        NEXT_STATE <= ADD_KEY;     
                     end if;
+                else
+                    NEXT_STATE <= ADD_KEY;      
                 end if; 
             when ADD_KEY_LAST =>
                 START_KEYS <= '0';
@@ -262,11 +280,15 @@ begin
                 DATA_NEXT_MIX <= DATA_SHIFT;
                 CIPHER_TEXT <= (others => '0');
                 DONE_ALGO <= '0'; 
-                 if(DONE_ADD = '1')then
+                if(DONE_ADD = '1')then
                     if(NB_ROUND = MAX_ROUND)then 
                         NEXT_STATE <= COMPLETE;
+                    else
+                        NEXT_STATE <= ADD_KEY_LAST;
                     end if;
-                 end if;                    
+                else
+                    NEXT_STATE <= ADD_KEY_LAST;   
+                end if;                    
             when COMPLETE =>
                 START_KEYS <= '0';
                 VALID_ROUND_KEY <= '0';

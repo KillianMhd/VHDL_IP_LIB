@@ -69,8 +69,6 @@ entity AXI_LITE_INTERFACE is
         WR_EN_KEY_DEC       : out std_logic; 
         RD_EN_DECIPHER      : out std_logic;    
         RD_EN_CIPHER        : out std_logic;
-        VALID_ENC           : in std_logic;
-        VALID_DEC           : in std_logic;
         -- KEY -- 
         CIPHER_KEY          : out std_logic_vector(31 downto 0);
         DECIPHER_KEY        : out std_logic_vector(31 downto 0);
@@ -173,7 +171,6 @@ reg_status(10)  <= DECIPHER_TEXT_EMPTY;
 reg_status(11)  <= DECIPHER_TEXT_FULL;
 reg_status(12)  <= ENC_TEXT_EMPTY;
 reg_status(13)  <= ENC_TEXT_FULL;
---reg_status(31 downto 14) <= (others => '0');
 -- Control register
 START_CIPHER        <= reg_ctrl(0);
 START_DECIPHER      <= reg_ctrl(1);
@@ -377,10 +374,12 @@ P_RDATA : process (S_AXI_ACLK, S_AXI_ARESETN)
 begin
     if (S_AXI_ARESETN = '0') then
         axi_rdata <= (others => '0');
+        
     elsif rising_edge(S_AXI_ACLK) then
         loc_addr := axi_araddr(7 downto 0);
             case loc_addr is
                 when STATUS =>
+                    reg_status(31 downto 14) <= (others => '0');
                     axi_rdata <= reg_status;  
                 when CONTROL =>
                     axi_rdata <= reg_ctrl;

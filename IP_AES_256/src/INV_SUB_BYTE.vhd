@@ -70,6 +70,8 @@ begin
                 temp_data <= (others => '0');
                 if(VALID = '1' and done_algo = '0')then 
                     NEXT_STATE <= SUB;
+                else
+                    NEXT_STATE <= IDLE;    
                 end if;    
             when SUB =>
                 READY <= '0';

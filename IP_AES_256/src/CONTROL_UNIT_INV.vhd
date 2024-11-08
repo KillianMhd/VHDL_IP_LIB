@@ -113,7 +113,7 @@ begin
                 DATA_FOR_SHF <= (others => '0');
                 DATA_FOR_MIX <= (others => '0');
                 PLAIN_TEXT <= (others => '0');
-                DONE_ALGO <= '0';
+                DONE_ALGO <= '1';
                 if(START_ALGO = '1')then
                     NEXT_STATE <= INIT;
                 else
@@ -145,6 +145,8 @@ begin
                 if(DONE_KEYS = '1')then
                     if(NB_ROUND = 0 and READY_ROUND_KEY = '1')then
                         NEXT_STATE <= ADD_KEY_INIT;
+                    else
+                        NEXT_STATE <= INIT;         
                     end if;
                 else    
                     NEXT_STATE <= INIT;       
@@ -167,7 +169,11 @@ begin
                 if(DONE_SHF = '1')then
                     if(NB_ROUND < MAX_ROUND and READY_SUB = '1')then
                         NEXT_STATE <= INV_SBOX;
+                    else
+                        NEXT_STATE <= INIT_INV_SHIFT;     
                     end if;    
+                else
+                    NEXT_STATE <= INIT_INV_SHIFT;      
                 end if;        
             when INV_SHIFT =>
                 START_KEYS <= '0';
@@ -189,7 +195,11 @@ begin
                         NEXT_STATE <= INV_SBOX;
                     elsif(NB_ROUND = MAX_ROUND and READY_SUB = '1')then
                         NEXT_STATE <= INV_SBOX;
+                    else
+                        NEXT_STATE <= INV_SHIFT;      
                     end if;
+                else
+                    NEXT_STATE <= INV_SHIFT;        
                 end if;                 
             when INV_SBOX =>
                 START_KEYS <= '0';
@@ -211,7 +221,11 @@ begin
                         NEXT_STATE <= ADD_KEY;
                     elsif(NB_ROUND = MAX_ROUND and READY_ROUND_KEY = '1')then
                         NEXT_STATE <= ADD_KEY_LAST;
+                    else
+                        NEXT_STATE <= INV_SHIFT;    
                     end if;
+                else
+                    NEXT_STATE <= INV_SHIFT;    
                 end if;           
             when INV_MIX =>
                 START_KEYS <= '0';
@@ -230,6 +244,8 @@ begin
                 DONE_ALGO <= '0';
                 if(DONE_MIX = '1'and READY_SHIFT = '1')then
                     NEXT_STATE <= INV_SHIFT;
+                else
+                    NEXT_STATE <= INV_MIX;    
                 end if;
             when ADD_KEY_INIT =>
                 START_KEYS <= '0';
@@ -248,6 +264,8 @@ begin
                 DONE_ALGO <= '0';
                 if(DONE_ADD = '1' and READY_SHIFT = '1')then
                     NEXT_STATE <= INIT_INV_SHIFT;
+                else
+                    NEXT_STATE <= ADD_KEY_INIT;        
                 end if;         
             when ADD_KEY =>
                 START_KEYS <= '0';
@@ -266,8 +284,12 @@ begin
                 DONE_ALGO <= '0';
                 if(DONE_ADD = '1')then
                     if(NB_ROUND < MAX_ROUND and READY_MIX = '1')then
-                        NEXT_STATE <= INV_MIX;   
+                        NEXT_STATE <= INV_MIX;
+                    else
+                        NEXT_STATE <= ADD_KEY;           
                     end if;
+                else
+                    NEXT_STATE <= ADD_KEY;          
                 end if; 
             when ADD_KEY_LAST =>
                 START_KEYS <= '0';
@@ -287,7 +309,11 @@ begin
                  if(DONE_ADD = '1')then
                     if(NB_ROUND = MAX_ROUND)then 
                         NEXT_STATE <= COMPLETE;
+                    else
+                        NEXT_STATE <= ADD_KEY_LAST;       
                     end if;
+                 else
+                    NEXT_STATE <= ADD_KEY_LAST;        
                  end if;                    
             when COMPLETE =>
                 START_KEYS <= '0';
@@ -306,7 +332,7 @@ begin
                 DONE_ALGO <= '1';
                 NEXT_STATE <= IDLE;                  
             when others =>
-                null;
+                NEXT_STATE <= IDLE;
         end case;
     end process P_COMB;
 end Behavioral;
