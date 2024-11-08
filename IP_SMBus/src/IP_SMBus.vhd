@@ -67,7 +67,7 @@ architecture Behavioral of IP_SMBus is
 
   component SMBus_CONTROLLER is
     generic (
-      INPUT_CLK : integer := 100_000_000;
+      INPUT_CLK : integer := 100_000_000; -- FPGA Clock input
       BUS_CLK   : integer := 400_000);
     port (
       CLK      : in std_logic;

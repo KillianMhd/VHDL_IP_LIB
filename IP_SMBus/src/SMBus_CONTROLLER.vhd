@@ -295,4 +295,9 @@ begin
       end if;
     end if;
   end process p_ctrl;
+
+  with current_state select smbdat_ena <=
+    clk_prev when start,
+    not clk_prev when stop,
+    smbdat_int when others;
 end Behavioral;
